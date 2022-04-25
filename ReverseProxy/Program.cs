@@ -10,16 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
-// disable ssl cert check
-builder.Services.AddHttpClient("HttpClientWithSSLUntrusted").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-{
-    ClientCertificateOptions = ClientCertificateOption.Manual,
-    ServerCertificateCustomValidationCallback =
-    (httpRequestMessage, cert, cetChain, policyErrors) =>
-    {
-        return true;
-    }
-});
+
 builder.Services.AddProxy(
     options =>
         {

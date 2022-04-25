@@ -17,7 +17,16 @@ namespace Microsoft.AspNetCore.Proxy
             }
 
             Options = options.Value;
-            Client = new HttpClient(Options.MessageHandler ?? new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
+
+            var handler = new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false};
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback = 
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+            {
+                return true;
+            };
+
+            Client = new HttpClient(Options.MessageHandler ?? handler);
         }
 
         public SharedProxyOptions Options { get; private set; }
