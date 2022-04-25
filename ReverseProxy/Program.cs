@@ -11,15 +11,15 @@ using System.Net.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 // disable ssl cert check
-ServicePointManager.ServerCertificateValidationCallback += 
-    delegate(
-        Object sender1,
-        X509Certificate certificate,
-        X509Chain chain,
-        SslPolicyErrors sslPolicyErrors)
+builder.Services.AddHttpClient("HttpClientWithSSLUntrusted").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    ClientCertificateOptions = ClientCertificateOption.Manual,
+    ServerCertificateCustomValidationCallback =
+    (httpRequestMessage, cert, cetChain, policyErrors) =>
     {
         return true;
-    };
+    }
+});
 builder.Services.AddProxy(
     options =>
         {
