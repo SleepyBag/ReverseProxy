@@ -97,11 +97,11 @@ namespace Microsoft.AspNetCore.Builder
 
                 using (var requestMessage = context.CreateProxyHttpRequest(destinationUri))
                 {
-                    var prepareRequestHandler = proxyService.Options.PrepareRequest;
-                    if (prepareRequestHandler != null)
-                    {
-                        await prepareRequestHandler(context.Request, requestMessage);
-                    }
+                    // var prepareRequestHandler = proxyService.Options.PrepareRequest;
+                    // if (prepareRequestHandler != null)
+                    // {
+                    //     await prepareRequestHandler(context.Request, requestMessage);
+                    // }
 
                     using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
                     {
