@@ -25,6 +25,4 @@ var app = builder.Build();
 
 app.UseWebSockets().RunProxy(new Uri(args[0]));
 
-app.UseHsts();
-app.UseHttpsRedirection();
 app.Run();
