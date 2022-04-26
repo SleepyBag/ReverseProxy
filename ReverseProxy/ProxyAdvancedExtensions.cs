@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.Proxy
         {
             var request = context.Request;
 
-            var requestMessage = new HttpRequestMessage();
+            var requestMessage = new HttpRequestMessage() { Version = new Version(2, 0) };
             var requestMethod = request.Method;
             if (!HttpMethods.IsGet(requestMethod) &&
                 !HttpMethods.IsHead(requestMethod) &&
