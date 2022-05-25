@@ -45,7 +45,7 @@ namespace Microsoft.AspNetCore.Proxy
             _options = options.Value;
         }
 
-        public Task Invoke(HttpContext context)
+        async public Task Invoke(HttpContext context)
         {
             if (context == null)
             {
@@ -53,7 +53,7 @@ namespace Microsoft.AspNetCore.Proxy
             }
 
             var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, _options.Host, _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
-            return context.ProxyRequest(uri);
+            await context.ProxyRequest(uri);
         }
     }
 }
