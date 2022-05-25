@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.Proxy
             }
         }
 
-        public static Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage)
+        public static async Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage)
         {
             if (requestMessage == null)
             {
@@ -164,7 +164,7 @@ namespace Microsoft.AspNetCore.Proxy
 
             var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
 
-            return proxyService.Client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
+            await proxyService.Client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
         }
 
         public static async Task CopyProxyHttpResponse(this HttpContext context, HttpResponseMessage responseMessage)
