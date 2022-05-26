@@ -78,6 +78,7 @@ namespace Microsoft.AspNetCore.Builder
         /// <param name="destinationUri">Destination Uri</param>
         public static async Task ProxyRequest(this HttpContext context, Uri destinationUri)
         {
+            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tProxyRequest\t{DateTime.Now.Ticks.ToString()}");
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -107,6 +108,7 @@ namespace Microsoft.AspNetCore.Builder
                     {
                         await context.CopyProxyHttpResponse(responseMessage);
                     }
+                    await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tGotResponse\t{DateTime.Now.Ticks.ToString()}");
                 }
                 await context.Response.CompleteAsync();
             }
