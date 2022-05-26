@@ -47,7 +47,7 @@ namespace Microsoft.AspNetCore.Proxy
 
         async public Task Invoke(HttpContext context)
         {
-            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tInvoke\t{DateTime.Now.Ticks.ToString()}");
+            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tInvoke\t{DateTime.Now.Ticks.ToString()}\n");
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));

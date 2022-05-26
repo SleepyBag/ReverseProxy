@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.Proxy
 
         public static async Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage)
         {
-            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tSendProxyHttpRequest\t{DateTime.Now.Ticks.ToString()}");
+            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tSendProxyHttpRequest\t{DateTime.Now.Ticks.ToString()}\n");
             if (requestMessage == null)
             {
                 throw new ArgumentNullException(nameof(requestMessage));
