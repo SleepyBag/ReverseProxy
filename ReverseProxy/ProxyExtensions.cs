@@ -78,7 +78,6 @@ namespace Microsoft.AspNetCore.Builder
         /// <param name="destinationUri">Destination Uri</param>
         public static async Task ProxyRequest(this HttpContext context, Uri destinationUri)
         {
-            await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tProxyRequest\t{DateTime.Now.Ticks.ToString()}\n");
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
@@ -103,14 +102,15 @@ namespace Microsoft.AspNetCore.Builder
                     // {
                     //     await prepareRequestHandler(context.Request, requestMessage);
                     // }
-
+                    await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tSendProxyHttpRequest\t{new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds().ToString()}\n");
                     using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
                     {
+                        await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tGotResponse\t{new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds().ToString()}\n");
                         await context.CopyProxyHttpResponse(responseMessage);
                     }
-                    await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tGotResponse\t{DateTime.Now.Ticks.ToString()}\n");
                 }
                 await context.Response.CompleteAsync();
+                await File.AppendAllTextAsync("/tmp/reverse-proxy-dotting", $"{context.TraceIdentifier}\tComplete\t{new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds().ToString()}\n");
             }
         }
     }
