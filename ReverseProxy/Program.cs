@@ -23,6 +23,6 @@ builder.Services.AddProxy(
 
 var app = builder.Build();
 
-app.UseWebSockets().RunProxy(new Uri(args[0]));
+app.UseWebSockets().RunProxy(args);
 
 app.Run();

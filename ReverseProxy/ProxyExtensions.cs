@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Proxy;
@@ -36,6 +37,33 @@ namespace Microsoft.AspNetCore.Builder
                 AppendQuery = new QueryString(baseUri.Query)
             };
             app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
+        }
+
+        public static void RunProxy(this IApplicationBuilder app, string[] uris)
+        {
+            var options = new IOptions<ProxyOptions>[uris.Length];
+            int i = 0;
+            foreach (string uriString in uris) {
+                var baseUri = new Uri(uriString);
+                if (app == null)
+                {
+                    throw new ArgumentNullException(nameof(app));
+                }
+                if (baseUri == null)
+                {
+                    throw new ArgumentNullException(nameof(baseUri));
+                }
+
+                var option = new ProxyOptions
+                {
+                    Scheme = baseUri.Scheme,
+                    Host = new HostString(baseUri.Authority),
+                    PathBase = baseUri.AbsolutePath,
+                    AppendQuery = new QueryString(baseUri.Query)
+                };
+                options[i++] = Options.Create(option);
+            }
+            app.UseMiddleware<ProxyMiddleware>(options);
         }
 
         /// <summary>
@@ -76,40 +104,36 @@ namespace Microsoft.AspNetCore.Builder
         /// </summary>
         /// <param name="context"></param>
         /// <param name="destinationUri">Destination Uri</param>
-        public static async Task ProxyRequest(this HttpContext context, Uri destinationUri)
+        public static async Task ProxyRequest(this HttpContext context, Uri[] destinationUris)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
-            if (destinationUri == null)
+            foreach (var destinationUri in destinationUris)
             {
-                throw new ArgumentNullException(nameof(destinationUri));
+                if (destinationUri == null)
+                {
+                    throw new ArgumentNullException(nameof(destinationUri));
+                }
             }
 
-            if (context.WebSockets.IsWebSocketRequest)
-            {
-                await context.AcceptProxyWebSocketRequest(destinationUri.ToWebSocketScheme());
-            }
-            else
-            {
-                var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
+            var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
 
+            var sendTasks = new List<Task<HttpResponseMessage>>();
+            foreach (var destinationUri in destinationUris)
+            {
                 using (var requestMessage = context.CreateProxyHttpRequest(destinationUri))
                 {
-                    // var prepareRequestHandler = proxyService.Options.PrepareRequest;
-                    // if (prepareRequestHandler != null)
-                    // {
-                    //     await prepareRequestHandler(context.Request, requestMessage);
-                    // }
-
-                    using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
-                    {
-                        await context.CopyProxyHttpResponse(responseMessage);
-                    }
+                    var sendTask = context.SendProxyHttpRequest(requestMessage);
+                    sendTasks.Add(sendTask);
                 }
-                await context.Response.CompleteAsync();
             }
+            await Task.WhenAll(sendTasks);
+            var bytes = Encoding.UTF8.GetBytes("Hello World");
+            await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+            // await context.CopyProxyHttpResponse(responseMessage);
+            await context.Response.CompleteAsync();
         }
     }
 }
