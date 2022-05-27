@@ -3,6 +3,7 @@
 
 using System;
 using System.Net.Http;
+using System.Net.Security;
 using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.Proxy
