@@ -10,7 +10,7 @@
   "profiles": {
     "ReverseProxy": {
       "commandName": "Project",
-      "commandLineArgs": "https://www.google.com.hk",
+      "commandLineArgs": " https://172.29.0.12:5000 https://172.29.0.13:5000 https://172.29.0.14:5000 https://172.29.0.15:5000 https://172.29.0.16:5000  --urls https://*:5000",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

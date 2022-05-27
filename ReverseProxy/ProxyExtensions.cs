@@ -41,27 +41,33 @@ namespace Microsoft.AspNetCore.Builder
 
         public static void RunProxy(this IApplicationBuilder app, string[] uris)
         {
-            var options = new IOptions<ProxyOptions>[uris.Length];
-            int i = 0;
+            var options = new List<IOptions<ProxyOptions>>();
             foreach (string uriString in uris) {
-                var baseUri = new Uri(uriString);
-                if (app == null)
+                try
                 {
-                    throw new ArgumentNullException(nameof(app));
-                }
-                if (baseUri == null)
-                {
-                    throw new ArgumentNullException(nameof(baseUri));
-                }
+                    var baseUri = new Uri(uriString);
+                    if (app == null)
+                    {
+                        throw new ArgumentNullException(nameof(app));
+                    }
+                    if (baseUri == null)
+                    {
+                        throw new ArgumentNullException(nameof(baseUri));
+                    }
 
-                var option = new ProxyOptions
+                    var option = new ProxyOptions
+                    {
+                        Scheme = baseUri.Scheme,
+                        Host = new HostString(baseUri.Authority),
+                        PathBase = baseUri.AbsolutePath,
+                        AppendQuery = new QueryString(baseUri.Query)
+                    };
+                    options.Add(Options.Create(option));
+                }
+                catch (Exception e)
                 {
-                    Scheme = baseUri.Scheme,
-                    Host = new HostString(baseUri.Authority),
-                    PathBase = baseUri.AbsolutePath,
-                    AppendQuery = new QueryString(baseUri.Query)
-                };
-                options[i++] = Options.Create(option);
+                    break;
+                }
             }
             app.UseMiddleware<ProxyMiddleware>(options);
         }
@@ -129,8 +135,17 @@ namespace Microsoft.AspNetCore.Builder
                     sendTasks.Add(sendTask);
                 }
             }
-            await Task.WhenAll(sendTasks);
-            var bytes = Encoding.UTF8.GetBytes("Hello World");
+            var responseMessages = await Task.WhenAll(sendTasks);
+            var statusCode = System.Net.HttpStatusCode.OK;
+            foreach (var responseMessage in responseMessages)
+            {
+                if (responseMessage.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    statusCode = responseMessage.StatusCode;
+                }
+            }
+            var bytes = statusCode == System.Net.HttpStatusCode.OK ? Encoding.UTF8.GetBytes("Hello World") : Encoding.UTF8.GetBytes("Goodbye World");
+            context.Response.StatusCode = (int)statusCode;
             await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             // await context.CopyProxyHttpResponse(responseMessage);
             await context.Response.CompleteAsync();

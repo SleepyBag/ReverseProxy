@@ -22,9 +22,9 @@ namespace Microsoft.AspNetCore.Proxy
 
         private static readonly string[] NotForwardedWebSocketHeaders = new[] { "Connection", "Host", "Upgrade", "Sec-WebSocket-Key", "Sec-WebSocket-Version" };
 
-        public ProxyMiddleware(RequestDelegate next, IOptions<ProxyOptions>[] options)
+        public ProxyMiddleware(RequestDelegate next, List<IOptions<ProxyOptions>> options)
         {
-            _options = new ProxyOptions[options.Length];
+            _options = new ProxyOptions[options.Count()];
             int i = 0;
             foreach (var option in options)
             {
