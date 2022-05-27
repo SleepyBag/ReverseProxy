@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.Proxy
                 AutomaticDecompression = DecompressionMethods.None,
                 UseCookies = false,
                 SslOptions = sslOptions,
+                EnableMultipleHttp2Connections = true,
                 // NOTE: MaxResponseHeadersLength = 64, which means up to 64 KB of headers are allowed by default as of .NET Core 3.1.
             };
 
@@ -41,7 +42,7 @@ namespace Microsoft.AspNetCore.Proxy
             //     return true;
             // };
 
-            Client = new HttpClient(Options.MessageHandler ?? handler);
+            Client = new HttpClient(Options.MessageHandler ?? handler, disposeHandler: true);
             // Client.DefaultRequestVersion = new Version(2, 0);
         }
 
