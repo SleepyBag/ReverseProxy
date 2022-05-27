@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.Proxy
             };
 
             Client = new HttpClient(Options.MessageHandler ?? handler);
-            Client.DefaultRequestVersion = new Version(2, 0);
+            // Client.DefaultRequestVersion = new Version(2, 0);
         }
 
         public SharedProxyOptions Options { get; private set; }
