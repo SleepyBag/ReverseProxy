@@ -52,7 +52,7 @@ namespace Microsoft.AspNetCore.Proxy
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, _options.Host, _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
+            var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(context.Request.Headers["downstream"]), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
             await context.ProxyRequest(uri);
         }
     }
