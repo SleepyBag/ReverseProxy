@@ -2,6 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -57,12 +61,24 @@ namespace Microsoft.AspNetCore.Proxy
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var uris = new Uri[_options.Length];
+            var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
+            await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);
+            var content = Encoding.UTF8.GetString(buffer);
+            var uriStrings = content.Split(";");
+
+            var uris = new Uri[uriStrings.Length];
             int i = 0;
-            foreach (var option in _options) { 
-                var uri = new Uri(UriHelper.BuildAbsolute(option.Scheme, option.Host, option.PathBase, context.Request.Path, context.Request.QueryString.Add(option.AppendQuery)));
+            foreach (var uriString in uriStrings) { 
+                var uri = new Uri(UriHelper.BuildAbsolute(option.Scheme, uriString, option.PathBase, context.Request.Path, context.Request.QueryString.Add(option.AppendQuery)));
                 uris[i++] = uri;
             }
+
+            // reponse before broadcasting
+            var bytes = Encoding.UTF8.GetBytes("Hello World");
+            await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+            await context.Response.CompleteAsync();
+
+            // broadcast request
             await context.ProxyRequest(uris);
         }
     }

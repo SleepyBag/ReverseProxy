@@ -144,11 +144,6 @@ namespace Microsoft.AspNetCore.Builder
                     statusCode = responseMessage.StatusCode;
                 }
             }
-            var bytes = statusCode == System.Net.HttpStatusCode.OK ? Encoding.UTF8.GetBytes("Hello World") : Encoding.UTF8.GetBytes("Goodbye World");
-            context.Response.StatusCode = (int)statusCode;
-            await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-            // await context.CopyProxyHttpResponse(responseMessage);
-            await context.Response.CompleteAsync();
         }
     }
 }
