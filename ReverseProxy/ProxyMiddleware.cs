@@ -22,36 +22,27 @@ namespace Microsoft.AspNetCore.Proxy
         private const int DefaultWebSocketBufferSize = 4096;
 
         private readonly RequestDelegate _next;
-        private readonly ProxyOptions[] _options;
+        private readonly ProxyOptions _options;
 
         private static readonly string[] NotForwardedWebSocketHeaders = new[] { "Connection", "Host", "Upgrade", "Sec-WebSocket-Key", "Sec-WebSocket-Version" };
 
-        public ProxyMiddleware(RequestDelegate next, List<IOptions<ProxyOptions>> options)
+        public ProxyMiddleware(RequestDelegate next, IOptions<ProxyOptions> options)
         {
-            _options = new ProxyOptions[options.Count()];
-            int i = 0;
-            foreach (var option in options)
+            if (next == null)
             {
-                if (next == null)
-                {
-                    throw new ArgumentNullException(nameof(next));
-                }
-                if (option == null)
-                {
-                    throw new ArgumentNullException(nameof(option));
-                }
-                if (option.Value.Scheme == null)
-                {
-                    throw new ArgumentException("Options parameter must specify scheme.", nameof(option));
-                }
-                if (!option.Value.Host.HasValue)
-                {
-                    throw new ArgumentException("Options parameter must specify host.", nameof(option));
-                }
-                _options[i++] = option.Value;
+                throw new ArgumentNullException(nameof(next));
+            }
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+            if (options.Value.Scheme == null)
+            {
+                throw new ArgumentException("Options parameter must specify scheme.", nameof(options));
             }
 
             _next = next;
+            _options = options.Value;
         }
 
         async public Task Invoke(HttpContext context)
@@ -69,7 +60,7 @@ namespace Microsoft.AspNetCore.Proxy
             var uris = new Uri[uriStrings.Length];
             int i = 0;
             foreach (var uriString in uriStrings) { 
-                var uri = new Uri(UriHelper.BuildAbsolute(option.Scheme, uriString, option.PathBase, context.Request.Path, context.Request.QueryString.Add(option.AppendQuery)));
+                var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(uriString), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
                 uris[i++] = uri;
             }
 

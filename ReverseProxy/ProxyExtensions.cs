@@ -32,44 +32,10 @@ namespace Microsoft.AspNetCore.Builder
             var options = new ProxyOptions
             {
                 Scheme = baseUri.Scheme,
-                Host = new HostString(baseUri.Authority),
                 PathBase = baseUri.AbsolutePath,
                 AppendQuery = new QueryString(baseUri.Query)
             };
             app.UseMiddleware<ProxyMiddleware>(Options.Create(options));
-        }
-
-        public static void RunProxy(this IApplicationBuilder app, string[] uris)
-        {
-            var options = new List<IOptions<ProxyOptions>>();
-            foreach (string uriString in uris) {
-                try
-                {
-                    var baseUri = new Uri(uriString);
-                    if (app == null)
-                    {
-                        throw new ArgumentNullException(nameof(app));
-                    }
-                    if (baseUri == null)
-                    {
-                        throw new ArgumentNullException(nameof(baseUri));
-                    }
-
-                    var option = new ProxyOptions
-                    {
-                        Scheme = baseUri.Scheme,
-                        Host = new HostString(baseUri.Authority),
-                        PathBase = baseUri.AbsolutePath,
-                        AppendQuery = new QueryString(baseUri.Query)
-                    };
-                    options.Add(Options.Create(option));
-                }
-                catch (Exception e)
-                {
-                    break;
-                }
-            }
-            app.UseMiddleware<ProxyMiddleware>(options);
         }
 
         /// <summary>

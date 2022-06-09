@@ -16,11 +16,6 @@ namespace Microsoft.AspNetCore.Proxy
         public string Scheme { get; set; }
 
         /// <summary>
-        /// Destination uri host
-        /// </summary>
-        public HostString Host { get; set; }
-
-        /// <summary>
         /// Destination uri path base to which current Path will be appended
         /// </summary>
         public PathString PathBase { get; set; }
