@@ -64,14 +64,15 @@ namespace Microsoft.AspNetCore.Proxy
                 uris[i++] = uri;
             }
 
+            // broadcast request
+            await context.ProxyRequest(uris);
+
             // reponse before broadcasting
             var bytes = Encoding.UTF8.GetBytes("Hello World");
             context.Response.StatusCode = StatusCodes.Status200OK;
             await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             await context.Response.CompleteAsync();
 
-            // broadcast request
-            await context.ProxyRequest(uris);
         }
     }
 }
