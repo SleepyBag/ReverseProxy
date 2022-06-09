@@ -55,15 +55,15 @@ namespace Microsoft.AspNetCore.Proxy
             var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
             await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);
             var content = Encoding.UTF8.GetString(buffer);
-            Console.Error.WriteLine(content);
-            Console.Error.WriteLine(content.Length);
+            // Console.Error.WriteLine(content);
+            // Console.Error.WriteLine(content.Length);
             var uriStrings = content.Split(";");
 
             var uris = new Uri[uriStrings.Length];
             int i = 0;
             foreach (var uriString in uriStrings) {
-                Console.Error.WriteLine(uriString);
-                Console.Error.WriteLine(uriString.Length);
+                // Console.Error.WriteLine(uriString);
+                // Console.Error.WriteLine(uriString.Length);
                 var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(uriString), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
                 uris[i++] = uri;
             }
