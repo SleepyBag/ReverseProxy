@@ -43,15 +43,15 @@ namespace Microsoft.AspNetCore.Proxy
             var request = context.Request;
 
             var requestMessage = new HttpRequestMessage() { Version = new Version(2, 0) };
-            var requestMethod = request.Method;
-            if (!HttpMethods.IsGet(requestMethod) &&
-                !HttpMethods.IsHead(requestMethod) &&
-                !HttpMethods.IsDelete(requestMethod) &&
-                !HttpMethods.IsTrace(requestMethod))
-            {
-                var streamContent = new StreamContent(request.Body);
-                requestMessage.Content = streamContent;
-            }
+            // var requestMethod = request.Method;
+            // if (!HttpMethods.IsGet(requestMethod) &&
+            //     !HttpMethods.IsHead(requestMethod) &&
+            //     !HttpMethods.IsDelete(requestMethod) &&
+            //     !HttpMethods.IsTrace(requestMethod))
+            // {
+            //     var streamContent = new StreamContent(request.Body);
+            //     requestMessage.Content = streamContent;
+            // }
 
             // Copy the request headers
             foreach (var header in request.Headers)
@@ -64,7 +64,7 @@ namespace Microsoft.AspNetCore.Proxy
 
             requestMessage.Headers.Host = uri.Authority;
             requestMessage.RequestUri = uri;
-            requestMessage.Method = new HttpMethod(request.Method);
+            requestMessage.Method = new HttpMethod("GET");
 
             return requestMessage;
         }
