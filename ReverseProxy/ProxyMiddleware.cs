@@ -57,18 +57,19 @@ namespace Microsoft.AspNetCore.Proxy
             var content = Encoding.UTF8.GetString(buffer);
             var uriStrings = content.Split(";");
 
-            // reponse before broadcasting
-            var bytes = Encoding.UTF8.GetBytes("Hello World");
-            context.Response.StatusCode = StatusCodes.Status200OK;
-            await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
-            await context.Response.CompleteAsync();
-
             var uris = new Uri[uriStrings.Length];
             int i = 0;
             foreach (var uriString in uriStrings) { 
                 var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(uriString), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
                 uris[i++] = uri;
             }
+
+            // reponse before broadcasting
+            var bytes = Encoding.UTF8.GetBytes("Hello World");
+            context.Response.StatusCode = StatusCodes.Status200OK;
+            await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+            await context.Response.CompleteAsync();
+
             // broadcast request
             await context.ProxyRequest(uris);
         }
