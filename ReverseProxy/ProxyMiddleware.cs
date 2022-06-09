@@ -59,7 +59,8 @@ namespace Microsoft.AspNetCore.Proxy
 
             var uris = new Uri[uriStrings.Length];
             int i = 0;
-            foreach (var uriString in uriStrings) { 
+            foreach (var uriString in uriStrings) {
+                Console.Error.WriteLine(uriString);
                 var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(uriString), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
                 uris[i++] = uri;
             }
