@@ -52,11 +52,7 @@ namespace Microsoft.AspNetCore.Proxy
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
-            await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);
-            var content = Encoding.ASCII.GetString(buffer);
-            // Console.Error.WriteLine(content);
-            // Console.Error.WriteLine(content.Length);
+            var content = context.Request.Headers["downstream"].ToString();
             var uriStrings = content.Split(";");
 
             var uris = new List<Uri>();
