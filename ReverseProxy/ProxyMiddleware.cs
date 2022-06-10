@@ -59,13 +59,21 @@ namespace Microsoft.AspNetCore.Proxy
             // Console.Error.WriteLine(content.Length);
             var uriStrings = content.Split(";");
 
-            var uris = new Uri[uriStrings.Length];
-            int i = 0;
+            var uris = new List<Uri>();
             foreach (var uriString in uriStrings) {
                 // Console.Error.WriteLine(uriString);
                 // Console.Error.WriteLine(uriString.Length);
-                var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString(uriString), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
-                uris[i++] = uri;
+                var hostPortRange = uriString.Split(":");
+                var host = hostPortRange[0];
+                var portRange = hostPortRange[1];
+                var minPortMaxPort = portRange.Split("-");
+                int minPort = Int32.Parse(minPortMaxPort[0]);
+                int maxPort = Int32.Parse(minPortMaxPort[1]);
+                for (int port = minPort; port <= maxPort; ++port)
+                {
+                    var uri = new Uri(UriHelper.BuildAbsolute(_options.Scheme, new HostString($"{host}:{port}"), _options.PathBase, context.Request.Path, context.Request.QueryString.Add(_options.AppendQuery)));
+                    uris.Add(uri);
+                }
             }
 
             // reponse before broadcasting
@@ -75,7 +83,7 @@ namespace Microsoft.AspNetCore.Proxy
             await context.Response.CompleteAsync();
 
             // broadcast request
-            await context.ProxyRequest(uris);
+            await context.ProxyRequest(uris.ToArray());
         }
     }
 }
