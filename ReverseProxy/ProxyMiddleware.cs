@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Proxy
 
             var buffer = new byte[Convert.ToInt32(context.Request.ContentLength)];
             await context.Request.Body.ReadAsync(buffer, 0, buffer.Length);
-            var content = Encoding.UTF8.GetString(buffer);
+            var content = Encoding.ASCII.GetString(buffer);
             // Console.Error.WriteLine(content);
             // Console.Error.WriteLine(content.Length);
             var uriStrings = content.Split(";");
@@ -68,15 +68,14 @@ namespace Microsoft.AspNetCore.Proxy
                 uris[i++] = uri;
             }
 
-            // broadcast request
-            await context.ProxyRequest(uris);
-
             // reponse before broadcasting
-            var bytes = Encoding.UTF8.GetBytes("Hello World");
+            var bytes = Encoding.ASCII.GetBytes("Hello World");
             context.Response.StatusCode = StatusCodes.Status200OK;
             await context.Response.Body.WriteAsync(bytes, 0, bytes.Length);
             await context.Response.CompleteAsync();
 
+            // broadcast request
+            await context.ProxyRequest(uris);
         }
     }
 }
