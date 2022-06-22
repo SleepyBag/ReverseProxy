@@ -177,12 +177,12 @@ namespace Microsoft.AspNetCore.Proxy
             var response = context.Response;
 
             response.StatusCode = (int)responseMessage.StatusCode;
-            foreach (var header in responseMessage.Headers)
+            foreach (var header in responseMessage.Headers.NonValidated)
             {
                 response.Headers[header.Key] = header.Value.ToArray();
             }
 
-            foreach (var header in responseMessage.Content.Headers)
+            foreach (var header in responseMessage.Content.Headers.NonValidated)
             {
                 response.Headers[header.Key] = header.Value.ToArray();
             }
