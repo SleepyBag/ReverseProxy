@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Microsoft.Extensions.DependencyInjection;
+using ReverseProxy;
 
 namespace Microsoft.AspNetCore.Proxy
 {
@@ -165,7 +166,8 @@ namespace Microsoft.AspNetCore.Proxy
 
             var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
 
-            return await proxyService.Client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
+            var activityCancellationSource = ActivityCancellationTokenSource.Rent(TimeSpan.FromSeconds(100), context.RequestAborted);
+            return await proxyService.Client.SendAsync(requestMessage, activityCancellationSource.Token);
         }
 
         public static async Task CopyProxyHttpResponse(this HttpContext context, HttpResponseMessage responseMessage)
