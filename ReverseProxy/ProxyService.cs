@@ -34,11 +34,11 @@ namespace Microsoft.AspNetCore.Proxy
                 EnableMultipleHttp2Connections = true,
             };
 
-            Client = new HttpClient(Options.MessageHandler ?? handler, disposeHandler: true);
+            Client = new HttpMessageInvoker(Options.MessageHandler ?? handler, disposeHandler: true);
         }
 
         public SharedProxyOptions Options { get; private set; }
-        internal HttpClient Client { get; private set; }
+        internal HttpMessageInvoker Client { get; private set; }
     }
 }
 
