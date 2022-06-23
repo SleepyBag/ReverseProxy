@@ -31,6 +31,7 @@ namespace Microsoft.AspNetCore.Proxy
                 AutomaticDecompression = DecompressionMethods.None,
                 UseCookies = false,
                 SslOptions = sslOptions,
+                MaxConnectionsPerServer = 10,
                 EnableMultipleHttp2Connections = true,
             };
 
