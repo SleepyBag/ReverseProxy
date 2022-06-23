@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.Builder
                         await context.CopyProxyHttpResponse(responseMessage);
                     }
                 }
-                await context.Response.CompleteAsync();
+                // await context.Response.CompleteAsync();
             }
         }
     }
