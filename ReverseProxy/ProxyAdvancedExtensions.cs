@@ -167,7 +167,9 @@ namespace Microsoft.AspNetCore.Proxy
             var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
 
             var activityCancellationSource = ActivityCancellationTokenSource.Rent(TimeSpan.FromSeconds(100), context.RequestAborted);
-            return await proxyService.Client.SendAsync(requestMessage, activityCancellationSource.Token);
+            var responseMessage = await proxyService.Client.SendAsync(requestMessage, activityCancellationSource.Token);
+            activityCancellationSource.Return();
+            return responseMessage;
         }
 
         public static async Task CopyProxyHttpResponse(this HttpContext context, HttpResponseMessage responseMessage)
