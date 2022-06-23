@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Proxy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ReverseProxy;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -103,10 +104,12 @@ namespace Microsoft.AspNetCore.Builder
                     //     await prepareRequestHandler(context.Request, requestMessage);
                     // }
 
-                    using (var responseMessage = await context.SendProxyHttpRequest(requestMessage))
+                    var activityCancellationSource = ActivityCancellationTokenSource.Rent(TimeSpan.FromSeconds(100), context.RequestAborted);
+                    using (var responseMessage = await context.SendProxyHttpRequest(requestMessage, activityCancellationSource))
                     {
                         await context.CopyProxyHttpResponse(responseMessage);
                     }
+                    activityCancellationSource.Return();
                 }
                 // await context.Response.CompleteAsync();
             }

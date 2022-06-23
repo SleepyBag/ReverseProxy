@@ -157,7 +157,7 @@ namespace Microsoft.AspNetCore.Proxy
             }
         }
 
-        public static async Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage)
+        public static async Task<HttpResponseMessage> SendProxyHttpRequest(this HttpContext context, HttpRequestMessage requestMessage, ActivityCancellationTokenSource cancellationTokenSource)
         {
             if (requestMessage == null)
             {
@@ -166,9 +166,7 @@ namespace Microsoft.AspNetCore.Proxy
 
             var proxyService = context.RequestServices.GetRequiredService<ProxyService>();
 
-            var activityCancellationSource = ActivityCancellationTokenSource.Rent(TimeSpan.FromSeconds(100), context.RequestAborted);
-            var responseMessage = await proxyService.Client.SendAsync(requestMessage, activityCancellationSource.Token);
-            activityCancellationSource.Return();
+            var responseMessage = await proxyService.Client.SendAsync(requestMessage, cancellationTokenSource.Token);
             return responseMessage;
         }
 
