@@ -10,7 +10,7 @@ namespace ReverseProxy;
 internal sealed class ActivityCancellationTokenSource : CancellationTokenSource
 {
 #if NET6_0_OR_GREATER
-    private const int MaxQueueSize = 4096;
+    private const int MaxQueueSize = 1024;
     private static readonly ConcurrentQueue<ActivityCancellationTokenSource> _sharedSources = new();
     private static int _count;
 #endif
